@@ -5,6 +5,7 @@
 
 typedef struct bit_array bit_array;
 typedef uint64_t word_t, word_addr_t, bit_index_t;
+typedef uint8_t word_offset_t; // Offset within a 64 bit word
 
 
 #define BIT_INDEX_MIN 0
@@ -24,6 +25,14 @@ struct bit_array
 
 bit_array *bit_array_create(word_addr_t num_of_words);
 void bit_array_free(bit_array *);
+void bit_array_add(bit_array *src, const bit_array *add);
+void bit_array_add_uint64(bit_array* bitarr, uint64_t value);
+int bit_array_cmp(const bit_array *left, const bit_array *right);
+void bit_array_set_all(bit_array* bitarr);
+void bit_array_clear_all(bit_array* bitarr);
+
+bit_index_t bit_array_length(const bit_array* bit_arr);
+bit_array* bit_array_clone(const bit_array* bitarr);
 
 #define bit_array_get(arr,i)      bitset_get((arr)->words, i)
 #define bit_array_set(arr,i)      bitset_set((arr)->words, i)
