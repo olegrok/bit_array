@@ -181,6 +181,12 @@ test_shift()
 	bit_array *array = bit_array_create(2);
 
 	bit_array_set(array, 0);
+	bit_array_shift_left(array, 0);
+
+	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
+		assert(bit_array_get(array, i) == (i == 0));
+	}
+
 	bit_array_shift_left(array, 1);
 
 	assert(bit_array_get(array, 0) == 0);
@@ -197,7 +203,14 @@ test_shift()
 
 	assert(bit_array_get(array, 1) == 1);
 	assert(bit_array_get(array, WORD_SIZE + 2) == 1);
+	bit_array_free(array);
 
+	array = bit_array_create(2);
+	bit_array_set(array, 0);
+	bit_array_shift_left(array, 2 * WORD_SIZE);
+	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
+		assert(bit_array_get(array, i) == 0);
+	}
 	bit_array_free(array);
 }
 
