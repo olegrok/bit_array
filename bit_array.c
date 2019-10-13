@@ -7,12 +7,18 @@
 #define WORD_MAX  (~(word_t)0)
 #define WORD_SIZE 64
 
-bit_array *bit_array_create(word_addr_t num_of_words)
+size_t
+bit_array_bsize(word_addr_t num_of_words)
 {
 	assert(num_of_words > 0);
-	size_t struct_size = sizeof(bit_array) + num_of_words * sizeof(word_t);
+	return sizeof(bit_array) + num_of_words * sizeof(word_t);
+}
 
-	bit_array *bitarr = (bit_array*)calloc(1, struct_size);
+bit_array *bit_array_create(word_addr_t num_of_words)
+{
+	size_t size = bit_array_bsize(num_of_words);
+
+	bit_array *bitarr = (bit_array*)calloc(1, size);
 	if (bitarr == NULL) {
 		return NULL;
 	}

@@ -2,6 +2,7 @@
 #define BIT_ARRAY_BIT_ARRAY_H
 
 #include <inttypes.h>
+#include <stdlib.h>
 
 typedef struct bit_array bit_array;
 typedef uint64_t word_t, word_addr_t, bit_index_t;
@@ -23,6 +24,7 @@ struct bit_array
 	word_t *words;
 };
 
+size_t bit_array_bsize(word_addr_t num_of_words);
 bit_array *bit_array_create(word_addr_t num_of_words);
 void bit_array_free(bit_array *);
 void bit_array_add(bit_array *src, const bit_array *add);
