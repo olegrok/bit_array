@@ -30,8 +30,7 @@ test_get()
 	}
 
 	for (size_t i = 0; i < 5 * WORD_SIZE; i++) {
-		int bit = bit_array_get(array, i);
-		assert(bit == 1);
+		assert(bit_array_get(array, i) == 1);
 	}
 
 	bit_array_free(array);
@@ -46,15 +45,13 @@ test_clear()
 	}
 
 	for (size_t i = 0; i < 5 * WORD_SIZE; i++) {
-		int bit = bit_array_get(array, i);
-		assert(bit == 1);
+		assert(bit_array_get(array, i) == 1);
 	}
 
 	for (size_t i = 0; i < 5 * WORD_SIZE; i++) {
 		bit_array_clear(array, i);
 		for (size_t j = 0; i < 5 * WORD_SIZE; i++) {
-			int bit = bit_array_get(array, j);
-			assert(bit == (j > i));
+			assert(bit_array_get(array, j) == (j > i));
 		}
 	}
 
@@ -70,7 +67,7 @@ test_toggle()
 	}
 
 	for (size_t i = 0; i < 5 * WORD_SIZE; i++) {
-		int bit = bit_array_get(array, i);
+		uint8_t bit = bit_array_get(array, i);
 		bit_array_toggle(array, i);
 		assert(bit != bit_array_get(array, i));
 	}
