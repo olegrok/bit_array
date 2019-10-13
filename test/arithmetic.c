@@ -85,6 +85,7 @@ test_add_uint64()
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		assert(bit_array_get(array, 0) == 0);
 	}
+	free(array);
 }
 
 static void
@@ -98,6 +99,7 @@ test_add_uint64_carry()
 	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == (i == WORD_SIZE));
 	}
+	free(array);
 }
 
 static void
@@ -112,6 +114,7 @@ test_add_uint64_carry2()
 		assert(bit_array_get(array, i) == 0);
 		assert(bit_array_get(array, i + WORD_SIZE) == 1);
 	}
+	free(array);
 }
 
 int

@@ -170,6 +170,35 @@ test_clone()
 		assert(bit_array_get(clone_array, i) == 1);
 		assert(bit_array_get(array, 3 * WORD_SIZE + i) == 1);
 	}
+
+	bit_array_free(array);
+	bit_array_free(clone_array);
+}
+
+static void
+test_shift()
+{
+	bit_array *array = bit_array_create(2);
+
+	bit_array_set(array, 0);
+	bit_array_shift_left(array, 1);
+
+	assert(bit_array_get(array, 0) == 0);
+	assert(bit_array_get(array, 1) == 1);
+
+	bit_array_shift_left(array, WORD_SIZE);
+
+	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
+		assert(bit_array_get(array, i) == (i == (WORD_SIZE + 1)));
+	}
+
+	bit_array_set(array, 0);
+	bit_array_shift_left(array, 1);
+
+	assert(bit_array_get(array, 1) == 1);
+	assert(bit_array_get(array, WORD_SIZE + 2) == 1);
+
+	bit_array_free(array);
 }
 
 int
@@ -186,5 +215,6 @@ main()
 	test_length();
 	test_num_of_words();
 	test_clone();
+	test_shift();
 	return 0;
 }
