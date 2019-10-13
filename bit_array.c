@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define WORD_MAX  (~(word_t)0)
+#define WORD_MAX  (~0ULL)
 #define WORD_SIZE 64ULL
 
 size_t
@@ -120,8 +120,7 @@ bit_array_clone(const bit_array* bitarr)
 {
 	bit_array* cpy = bit_array_create(bitarr->num_of_words);
 
-	if(cpy == NULL)
-	{
+	if(cpy == NULL) {
 		return NULL;
 	}
 
@@ -160,11 +159,10 @@ set_word(bit_array* bitarr, bit_index_t start, word_t word)
 				= (word << word_offset) |
 				  (bitarr->words[word_index] & bitmask64(word_offset));
 
-		if(word_index+1 < bitarr->num_of_words)
-		{
-			bitarr->words[word_index+1]
+		if(word_index+1 < bitarr->num_of_words) {
+			bitarr->words[word_index + 1]
 					= (word >> (WORD_SIZE - word_offset)) |
-					  (bitarr->words[word_index+1] & (WORD_MAX << word_offset));
+					  (bitarr->words[word_index + 1] & (WORD_MAX << word_offset));
 		}
 	}
 }
@@ -179,43 +177,32 @@ array_copy(bit_array* dst, bit_index_t dstindx,
 
 	word_offset_t bits_in_last_word = WORD_SIZE;
 
-	if(dst == src && srcindx > dstindx)
-	{
-		for(i = 0; i < num_of_full_words; i++)
-		{
+	if(dst == src && srcindx > dstindx) {
+		for(i = 0; i < num_of_full_words; i++) {
 			word_t word = get_word(src, srcindx + i * WORD_SIZE);
 			set_word(dst, dstindx + i * WORD_SIZE, word);
 		}
 
-		if(bits_in_last_word > 0)
-		{
-			word_t src_word = get_word(src, srcindx+i*WORD_SIZE);
-			word_t dst_word = get_word(dst, dstindx+i*WORD_SIZE);
+		word_t src_word = get_word(src, srcindx + i * WORD_SIZE);
+		word_t dst_word = get_word(dst, dstindx + i * WORD_SIZE);
 
-			word_t mask = bitmask64(bits_in_last_word);
-			word_t word = bitmask_merge(src_word, dst_word, mask);
+		word_t mask = bitmask64(bits_in_last_word);
+		word_t word = bitmask_merge(src_word, dst_word, mask);
 
-			set_word(dst, dstindx+num_of_full_words*WORD_SIZE, word);
-		}
+		set_word(dst, dstindx + num_of_full_words * WORD_SIZE, word);
 	} else {
-		for(i = 0; i < num_of_full_words; i++)
-		{
-			word_t word = get_word(src, srcindx+length-(i+1)*WORD_SIZE);
-			set_word(dst, dstindx+length-(i+1)*WORD_SIZE, word);
+		for(i = 0; i < num_of_full_words; i++) {
+			word_t word = get_word(src, srcindx + length - (i + 1) * WORD_SIZE);
+			set_word(dst, dstindx + length - (i + 1) * WORD_SIZE, word);
 		}
 
-		if(bits_in_last_word > 0)
-		{
-			word_t src_word = get_word(src, srcindx);
-			word_t dst_word = get_word(dst, dstindx);
+		word_t src_word = get_word(src, srcindx);
+		word_t dst_word = get_word(dst, dstindx);
 
-			word_t mask = bitmask64(bits_in_last_word);
-			word_t word = bitmask_merge(src_word, dst_word, mask);
-			set_word(dst, dstindx, word);
-		}
+		word_t mask = bitmask64(bits_in_last_word);
+		word_t word = bitmask_merge(src_word, dst_word, mask);
+		set_word(dst, dstindx, word);
 	}
-
-//	_mask_top_word(dst);
 }
 
 static inline void
