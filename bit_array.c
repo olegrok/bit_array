@@ -33,14 +33,11 @@ void bit_array_free(bit_array *array)
 	free(array);
 }
 
-static void
-arithmetic(bit_array* src,
-		   const bit_array* add,
-		   char subtract)
+void bit_array_add(bit_array* src, const bit_array* add)
 {
 	word_addr_t max_words = src->num_of_words;
 
-	char carry = subtract ? 1 : 0;
+	char carry = 0;
 
 	word_addr_t i;
 	word_t word1, word2;
@@ -49,19 +46,9 @@ arithmetic(bit_array* src,
 		word1 = src->words[i];
 		word2 = add->words[i];
 
-		if(subtract)
-			word2 = ~word2;
-
 		src->words[i] = word1 + word2 + carry;
-		// Update carry
 		carry = WORD_MAX - word1 < word2 || WORD_MAX - word1 - word2 < (word_t)carry;
 	}
-}
-
-void bit_array_add(bit_array* src, const bit_array* add)
-{
-	assert(src->num_of_words == add->num_of_words);
-	arithmetic(src, add, 0);
 }
 
 void bit_array_add_uint64(bit_array* bitarr, uint64_t value)
