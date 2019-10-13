@@ -58,6 +58,7 @@ CMakeCache.txt
 Makefile
 cmake-build-debug
 *.cmake
+!cmake/*
 
 # other
 *.cbp
