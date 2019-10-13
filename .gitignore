@@ -62,3 +62,4 @@ cmake-build-debug
 # other
 *.cbp
 .idea
+Testing/Temporary
