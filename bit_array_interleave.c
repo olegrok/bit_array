@@ -2,6 +2,7 @@
 #include "bit_array.h"
 
 static const size_t LOOKUP_TABLE_SIZE = 256;
+static const size_t LOOKUP_TABLE_BSIZE = 256 * sizeof(bit_array*);
 
 static void
 fill_table(bit_array **table, size_t dim, uint8_t shift)
@@ -19,27 +20,23 @@ fill_table(bit_array **table, size_t dim, uint8_t shift)
 	}
 }
 
-bit_array**
-bit_array_interleave_new_lookup_table(size_t dim)
+static int
+bit_array_interleave_new_lookup_table(size_t dim, bit_array** table,
+		size_t shift)
 {
-	bit_array **table = malloc(LOOKUP_TABLE_SIZE * sizeof(bit_array*));
-	if (table == NULL) {
-		return NULL;
-	}
-
 	for (size_t i = 0; i < LOOKUP_TABLE_SIZE; i++) {
 		table[i] = bit_array_create(dim);
 		if (table[i] == NULL) {
 			free(table);
-			return NULL;
+			return -1;
 		}
 	}
 
-	fill_table(table, dim, 0);
-	return table;
+	fill_table(table, dim, shift);
+	return 0;
 }
 
-void
+static void
 bit_array_interleave_free_lookup_table(bit_array **table)
 {
 	for (size_t i = 0; i < LOOKUP_TABLE_SIZE; i++) {
@@ -48,9 +45,51 @@ bit_array_interleave_free_lookup_table(bit_array **table)
 	free(table);
 }
 
+bit_array***
+bit_array_interleave_new_lookup_tables(size_t dim)
+{
+	bit_array ***tables = malloc(dim * sizeof(bit_array**));
+	if (tables == NULL) {
+		return NULL;
+	}
+
+	for(size_t i = 0; i < dim; i++) {
+		tables[i] = malloc(LOOKUP_TABLE_BSIZE);
+		if (tables[i] == 0) {
+			for(size_t j = 0; j < i; j++) {
+				free(tables[j]);
+			}
+			free(tables);
+			return NULL;
+		}
+	}
+
+	for(size_t i = 0; i < dim; i++) {
+		int res = bit_array_interleave_new_lookup_table(dim, tables[i], i);
+		if (res < 0) {
+			for(size_t j = 0; j < i; j++) {
+				bit_array_interleave_free_lookup_table(tables[j]);
+			}
+			free(tables);
+			return NULL;
+		}
+	}
+
+	return tables;
+}
+
+void
+bit_array_interleave_free_lookup_tables(bit_array ***tables, size_t dim)
+{
+	for (size_t i = 0; i < dim; i++) {
+		bit_array_interleave_free_lookup_table(tables[i]);
+	}
+	free(tables);
+}
+
 int
-bit_array_interleave(size_t dim, bit_array **table,
-		const uint64_t *in, bit_array *out)
+bit_array_interleave(bit_array ***tables, size_t dim,
+					 const uint64_t *in, bit_array *out)
 {
 	const size_t octets_count = 8;
 	const size_t octet_size = 8;
@@ -62,9 +101,8 @@ bit_array_interleave(size_t dim, bit_array **table,
 	for (size_t i = 0; i < octets_count; i++) {
 		size_t shift = octet_size * i;
 		for (size_t j = 0; j < dim; j++) {
-			bit_array_shift_left(tmp, 1);
-			uint8_t octet = (in[dim - j - 1] >> shift);
-			const bit_array *value = table[octet];
+			uint8_t octet = (in[j] >> shift);
+			const bit_array *value = tables[j][octet];
 			bit_array_or(tmp, tmp, value);
 		}
 		bit_array_shift_left(tmp, dim * shift);
