@@ -8,9 +8,11 @@ include(cmake/utils.cmake)
 include_directories("${PROJECT_SOURCE_DIR}")
 set(lib_headers
     bit_array.h
+    bit_array_interleave.h
     bit_array_macros.h)
 
 set(lib_sources
+    bit_array_interleave.c
     bit_array.c)
 
 add_library(${PROJECT_NAME} STATIC ${lib_sources})

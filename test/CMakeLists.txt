@@ -19,9 +19,13 @@ target_link_libraries(arithmetic.test bit_array)
 add_executable(comparison.test comparison.c)
 target_link_libraries(comparison.test bit_array)
 
+add_executable(interleave.test interleave.c)
+target_link_libraries(interleave.test bit_array)
+
 add_test(main ${CMAKE_CURRENT_BUILD_DIR}/main.test)
 add_test(arithmetic ${CMAKE_CURRENT_BUILD_DIR}/arithmetic.test)
 add_test(comparison ${CMAKE_CURRENT_BUILD_DIR}/comparison.test)
+add_test(interleave ${CMAKE_CURRENT_BUILD_DIR}/interleave.test)
 
 if(POLICY CMP0037)
     cmake_policy(SET CMP0037 OLD) # don't blame "test" target name
@@ -30,4 +34,4 @@ endif(POLICY CMP0037)
 add_custom_target(test
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}"
     COMMAND ctest
-    DEPENDS main.test arithmetic.test comparison.test)
+    DEPENDS main.test arithmetic.test comparison.test interleave.test)
