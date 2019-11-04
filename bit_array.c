@@ -242,3 +242,28 @@ bit_array_shift_left(bit_array* bitarr, bit_index_t shift_dist)
 	array_copy(bitarr, shift_dist, bitarr, 0, cpy_length);
 	set_region(bitarr, 0, shift_dist);
 }
+
+void
+bit_array_or(bit_array* dst, const bit_array* src1, const bit_array* src2)
+{
+	assert(dst->num_of_words == src1->num_of_words);
+	assert(src1->num_of_words == src2->num_of_words);
+	for(size_t i = 0; i < dst->num_of_words; i++)
+		dst->words[i] = src1->words[i] | src2->words[i];
+}
+
+void
+bit_array_and(bit_array* dst, const bit_array* src1, const bit_array* src2)
+{
+	assert(dst->num_of_words == src1->num_of_words);
+	assert(src1->num_of_words == src2->num_of_words);
+	for(size_t i = 0; i < dst->num_of_words; i++)
+		dst->words[i] = src1->words[i] & src2->words[i];
+}
+
+uint64_t
+bit_array_get_word(const bit_array *bitarr, bit_index_t num)
+{
+	assert(num < bitarr->num_of_words);
+	return bitarr->words[num];
+}

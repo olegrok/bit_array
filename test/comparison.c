@@ -29,6 +29,7 @@ test_two()
 {
 	bit_array *src = bit_array_create(2);
 	bit_array *add = bit_array_create(2);
+	assert(bit_array_cmp(src, add) == 0);
 
 	const size_t WORD_SIZE = 64;
 

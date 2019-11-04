@@ -214,6 +214,26 @@ test_shift()
 	bit_array_free(array);
 }
 
+static void
+test_get_word()
+{
+	bit_array *array = bit_array_create(5);
+
+	bit_array_set(array, 4 * 64 + 5);
+	bit_array_set(array, 3 * 64 + 4);
+	bit_array_set(array, 2 * 64 + 3);
+	bit_array_set(array, 1 * 64 + 2);
+	bit_array_set(array, 0 * 64 + 1);
+
+	assert(bit_array_get_word(array, 4) == 1 << 5);
+	assert(bit_array_get_word(array, 3) == 1 << 4);
+	assert(bit_array_get_word(array, 2) == 1 << 3);
+	assert(bit_array_get_word(array, 1) == 1 << 2);
+	assert(bit_array_get_word(array, 0) == 1 << 1);
+
+	bit_array_free(array);
+}
+
 int
 main()
 {
@@ -229,5 +249,6 @@ main()
 	test_num_of_words();
 	test_clone();
 	test_shift();
+	test_get_word();
 	return 0;
 }
