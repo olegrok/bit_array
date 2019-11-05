@@ -1,18 +1,17 @@
 #include <stdlib.h>
 #include "bit_array.h"
 
-static const size_t LOOKUP_TABLE_SIZE = 256;
-static const size_t LOOKUP_TABLE_BSIZE = 256 * sizeof(bit_array*);
+#define LOOKUP_TABLE_SIZE 256
+#define LOOKUP_TABLE_BSIZE (256 * sizeof(bit_array*))
+#define BIT_COUNT 8
 
 static void
 fill_table(bit_array **table, size_t dim, uint8_t shift)
 {
-	uint8_t one = 1;
-	const size_t BIT_COUNT = 8;
 	for(size_t i = 0; i < LOOKUP_TABLE_SIZE; i++) {
 		uint8_t num = i;
 		for (size_t j = 0; j < BIT_COUNT; j++) {
-			if (num & one) {
+			if (num & 1U) {
 				bit_array_set(table[i], j * dim + shift);
 			}
 			num >>= 1ULL;
@@ -103,10 +102,10 @@ bit_array_interleave(bit_array ***tables, size_t dim,
 		for (size_t j = 0; j < dim; j++) {
 			uint8_t octet = (in[j] >> shift);
 			const bit_array *value = tables[j][octet];
-			bit_array_or(tmp, tmp, value);
+			bit_array_or(tmp, value);
 		}
 		bit_array_shift_left(tmp, dim * shift);
-		bit_array_or(out, out, tmp);
+		bit_array_or(out, tmp);
 		bit_array_clear_all(tmp);
 	}
 	bit_array_free(tmp);

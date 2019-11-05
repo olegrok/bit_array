@@ -211,6 +211,18 @@ test_shift()
 	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == 0);
 	}
+
+	bit_array_clear_all(array);
+	bit_array_add_uint64(array, -1ULL);
+	assert(bit_array_get_word(array, 0) == -1ULL);
+	assert(bit_array_get_word(array, 1) == 0);
+	bit_array_shift_left(array, WORD_SIZE);
+	assert(bit_array_get_word(array, 0) == 0);
+	assert(bit_array_get_word(array, 1) == -1ULL);
+	bit_array_shift_left(array, WORD_SIZE);
+	assert(bit_array_get_word(array, 0) == 0);
+	assert(bit_array_get_word(array, 1) == 0);
+
 	bit_array_free(array);
 }
 

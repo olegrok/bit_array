@@ -122,11 +122,12 @@ test_or()
 {
 	bit_array *first = bit_array_create(2);
 	bit_array *second = bit_array_create(2);
-	bit_array *result = bit_array_create(2);
 	bit_array_set_all(first);
 
-	bit_array_or(result, first, second);
-	assert(bit_array_cmp(result, first) == 0);
+	bit_array_or(first, second);
+	assert(bit_array_get_word(first, 0) == -1ULL);
+	assert(bit_array_get_word(first, 1) == -1ULL);
+
 
 	bit_array_clear_all(first);
 	bit_array_clear_all(second);
@@ -139,18 +140,17 @@ test_or()
 	bit_array_set(second, 80);
 	bit_array_set(second, 30);
 	bit_array_set(second, 10);
-	bit_array_or(result, first, second);
+	bit_array_or(first, second);
 
-	assert(bit_array_get(result, 100) == 1);
-	assert(bit_array_get(result, 90) == 1);
-	assert(bit_array_get(result, 80) == 1);
-	assert(bit_array_get(result, 30) == 1);
-	assert(bit_array_get(result, 20) == 1);
-	assert(bit_array_get(result, 10) == 1);
+	assert(bit_array_get(first, 100) == 1);
+	assert(bit_array_get(first, 90) == 1);
+	assert(bit_array_get(first, 80) == 1);
+	assert(bit_array_get(first, 30) == 1);
+	assert(bit_array_get(first, 20) == 1);
+	assert(bit_array_get(first, 10) == 1);
 
 	bit_array_free(first);
 	bit_array_free(second);
-	bit_array_free(result);
 }
 
 static void
@@ -158,11 +158,11 @@ test_and()
 {
 	bit_array *first = bit_array_create(2);
 	bit_array *second = bit_array_create(2);
-	bit_array *result = bit_array_create(2);
 	bit_array_set_all(first);
 
-	bit_array_and(result, first, second);
-	assert(bit_array_cmp(result, second) == 0);
+	bit_array_and(first, second);
+	assert(bit_array_get_word(first, 0) == 0);
+	assert(bit_array_get_word(first, 1) == 0);
 
 	bit_array_clear_all(first);
 	bit_array_clear_all(second);
@@ -175,18 +175,17 @@ test_and()
 	bit_array_set(second, 80);
 	bit_array_set(second, 30);
 	bit_array_set(second, 10);
-	bit_array_and(result, first, second);
+	bit_array_and(first, second);
 
-	assert(bit_array_get(result, 100) == 0);
-	assert(bit_array_get(result, 90) == 0);
-	assert(bit_array_get(result, 80) == 1);
-	assert(bit_array_get(result, 30) == 0);
-	assert(bit_array_get(result, 20) == 0);
-	assert(bit_array_get(result, 10) == 1);
+	assert(bit_array_get(first, 100) == 0);
+	assert(bit_array_get(first, 90) == 0);
+	assert(bit_array_get(first, 80) == 1);
+	assert(bit_array_get(first, 30) == 0);
+	assert(bit_array_get(first, 20) == 0);
+	assert(bit_array_get(first, 10) == 1);
 
 	bit_array_free(first);
 	bit_array_free(second);
-	bit_array_free(result);
 }
 
 int

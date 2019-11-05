@@ -6,10 +6,6 @@
 
 typedef struct bit_array bit_array;
 typedef uint64_t word_t, word_addr_t, bit_index_t;
-typedef uint8_t word_offset_t; // Offset within a 64 bit word
-
-#define BIT_INDEX_MIN 0
-#define BIT_INDEX_MAX (~(bit_index_t)0)
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,10 +53,10 @@ bit_array*
 bit_array_clone(const bit_array *bitarr);
 
 void
-bit_array_or(bit_array *dst, const bit_array *src1, const bit_array *src2);
+bit_array_or(bit_array *dst, const bit_array *src);
 
 void
-bit_array_and(bit_array *dst, const bit_array *src1, const bit_array *src2);
+bit_array_and(bit_array *dst, const bit_array *src);
 
 uint64_t
 bit_array_get_word(const bit_array *bitarr, bit_index_t num);
