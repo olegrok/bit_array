@@ -176,6 +176,27 @@ test_clone()
 }
 
 static void
+test_copy()
+{
+	bit_array *array = bit_array_create(5);
+	bit_array *copy_array = bit_array_create(5);
+
+	for (size_t i = 0; i < WORD_SIZE; i++) {
+		bit_array_set(array, i);
+		bit_array_set(array, 3 * WORD_SIZE + i);
+	}
+
+	bit_array_copy(copy_array, array);
+	for (size_t i = 0; i < WORD_SIZE; i++) {
+		assert(bit_array_get(copy_array, i) == 1);
+		assert(bit_array_get(array, 3 * WORD_SIZE + i) == 1);
+	}
+
+	bit_array_free(array);
+	bit_array_free(copy_array);
+}
+
+static void
 test_shift()
 {
 	bit_array *array = bit_array_create(2);
@@ -260,6 +281,7 @@ main()
 	test_length();
 	test_num_of_words();
 	test_clone();
+	test_copy();
 	test_shift();
 	test_get_word();
 	return 0;

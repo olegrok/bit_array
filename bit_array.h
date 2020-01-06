@@ -22,8 +22,11 @@ struct bit_array
 size_t
 bit_array_bsize(word_addr_t num_of_words);
 
-bit_array*
+bit_array *
 bit_array_create(word_addr_t num_of_words);
+
+bit_array *
+bit_array_copy(bit_array *restrict dst, const bit_array *restrict src);
 
 void
 bit_array_free(bit_array *);
@@ -49,7 +52,7 @@ bit_array_shift_left(bit_array *bitarr, bit_index_t shift_dist);
 bit_index_t
 bit_array_length(const bit_array *bit_arr);
 
-bit_array*
+bit_array *
 bit_array_clone(const bit_array *bitarr);
 
 void

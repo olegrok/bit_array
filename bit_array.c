@@ -14,12 +14,12 @@ bit_array_bsize(word_addr_t num_of_words)
 	return sizeof(bit_array) + num_of_words * sizeof(word_t);
 }
 
-bit_array*
+bit_array *
 bit_array_create(word_addr_t num_of_words)
 {
 	size_t size = bit_array_bsize(num_of_words);
 
-	bit_array *bitarr = (bit_array*)calloc(1, size);
+	bit_array *bitarr = (bit_array *)calloc(1, size);
 	if (bitarr == NULL) {
 		return NULL;
 	}
@@ -36,7 +36,7 @@ bit_array_free(bit_array *array)
 }
 
 void
-bit_array_add(bit_array* src, const bit_array* add)
+bit_array_add(bit_array *src, const bit_array *add)
 {
 	assert(src->num_of_words == add->num_of_words);
 	word_addr_t num_of_words = src->num_of_words;
@@ -54,7 +54,7 @@ bit_array_add(bit_array* src, const bit_array* add)
 }
 
 void
-bit_array_add_uint64(bit_array* bitarr, uint64_t value)
+bit_array_add_uint64(bit_array *bitarr, uint64_t value)
 {
 	if(value == 0) {
 		return;
@@ -73,7 +73,8 @@ bit_array_add_uint64(bit_array* bitarr, uint64_t value)
 }
 
 static inline int
-bit_array_cmp_internal(const word_t *restrict left, const word_t *restrict right, size_t num)
+bit_array_cmp_internal(const word_t *restrict left, const word_t *restrict right,
+		size_t num)
 {
 	for(word_addr_t i = num - 1;; i--)
 	{
@@ -86,7 +87,7 @@ bit_array_cmp_internal(const word_t *restrict left, const word_t *restrict right
 }
 
 int
-bit_array_cmp(const bit_array* left, const bit_array* right)
+bit_array_cmp(const bit_array *left, const bit_array *right)
 {
 	assert(left->num_of_words == right->num_of_words);
 
@@ -95,40 +96,47 @@ bit_array_cmp(const bit_array* left, const bit_array* right)
 }
 
 void
-bit_array_set_all(bit_array* bitarr)
+bit_array_set_all(bit_array *bitarr)
 {
 	memset(bitarr->words, 0xFF, bitarr->num_of_words * sizeof(word_t));
 }
 
 void
-bit_array_clear_all(bit_array* bitarr)
+bit_array_clear_all(bit_array *bitarr)
 {
 	memset(bitarr->words, 0, bitarr->num_of_words * sizeof(word_t));
 }
 
 
 bit_index_t
-bit_array_length(const bit_array* bit_arr)
+bit_array_length(const bit_array *bit_arr)
 {
 	return bit_arr->num_of_words * WORD_SIZE;
 }
 
-bit_array*
-bit_array_clone(const bit_array* bitarr)
+bit_array *
+bit_array_copy(bit_array *restrict dst, const bit_array *restrict src)
 {
-	bit_array* cpy = bit_array_create(bitarr->num_of_words);
+	assert(dst->num_of_words == src->num_of_words);
+	memcpy(dst->words, src->words, src->num_of_words * sizeof(word_t));
 
-	if (cpy == NULL) {
+	return dst;
+}
+
+bit_array *
+bit_array_clone(const bit_array *src)
+{
+	bit_array *dst = bit_array_create(src->num_of_words);
+
+	if (dst == NULL) {
 		return NULL;
 	}
 
-	memcpy(cpy->words, bitarr->words, bitarr->num_of_words * sizeof(word_t));
-
-	return cpy;
+	return bit_array_copy(dst, src);
 }
 
 void
-bit_array_shift_left(bit_array* bitarr, bit_index_t shift_dist)
+bit_array_shift_left(bit_array *bitarr, bit_index_t shift_dist)
 {
 	if (shift_dist == 0) {
 		return;
@@ -159,7 +167,7 @@ bit_array_shift_left(bit_array* bitarr, bit_index_t shift_dist)
 }
 
 static inline void
-bit_array_or_internal(word_t * restrict dst, const word_t * restrict src, size_t num)
+bit_array_or_internal(word_t *restrict dst, const word_t *restrict src, size_t num)
 {
 	for(size_t i = 0; i < num; i++)
 		dst[i] |= src[i];
@@ -181,7 +189,7 @@ bit_array_and_internal(word_t *restrict dst, const word_t *restrict src, size_t 
 }
 
 void
-bit_array_and(bit_array* dst, const bit_array* src)
+bit_array_and(bit_array *restrict dst, const bit_array *restrict src)
 {
 	assert(dst->num_of_words == src->num_of_words);
 	size_t num_of_words = dst->num_of_words;
