@@ -1,8 +1,10 @@
 #include <stdlib.h>
+#include <assert.h>
+
 #include "bit_array.h"
+#include "bit_array_interleave.h"
 
 #define LOOKUP_TABLE_SIZE 256
-#define LOOKUP_TABLE_BSIZE (256 * sizeof(bit_array*))
 #define BIT_COUNT 8
 
 static void
@@ -19,95 +21,114 @@ fill_table(bit_array **table, size_t dim, uint8_t shift)
 	}
 }
 
-static int
-bit_array_interleave_new_lookup_table(size_t dim, bit_array** table,
-		size_t shift)
+static void
+bit_array_interleave_free_dim_lookup_table(bit_array **table)
 {
-	for (size_t i = 0; i < LOOKUP_TABLE_SIZE; i++) {
-		table[i] = bit_array_create(dim);
-		if (table[i] == NULL) {
-			free(table);
-			return -1;
-		}
+	if (table == NULL) {
+		return;
 	}
 
-	fill_table(table, dim, shift);
-	return 0;
-}
-
-static void
-bit_array_interleave_free_lookup_table(bit_array **table)
-{
 	for (size_t i = 0; i < LOOKUP_TABLE_SIZE; i++) {
-		bit_array_free(table[i]);
+		if (table[i] != NULL) {
+			bit_array_free(table[i]);
+			table[i] = NULL;
+		}
 	}
 	free(table);
 }
 
-bit_array***
+struct bit_array_interleave_lookup_table *
 bit_array_interleave_new_lookup_tables(size_t dim)
 {
-	bit_array ***tables = malloc(dim * sizeof(bit_array**));
-	if (tables == NULL) {
+	assert(dim > 0);
+	/* Allocate memory for structure */
+	struct bit_array_interleave_lookup_table *table = calloc(1,
+			sizeof(struct bit_array_interleave_lookup_table));
+
+	if (table == NULL) {
+		return NULL;
+	}
+	table->dim = dim;
+
+	/* Allocate memory for buffer */
+	table->buffer = bit_array_create(dim);
+	if (table->buffer == NULL) {
+		free(table);
+		return NULL;
+	}
+
+	/* Allocate memory for lookup tables for each dimension */
+	table->tables = calloc(dim, sizeof(bit_array***));
+	if (table->tables == NULL) {
+		free(table->buffer);
+		free(table);
 		return NULL;
 	}
 
 	for(size_t i = 0; i < dim; i++) {
-		tables[i] = malloc(LOOKUP_TABLE_BSIZE);
-		if (tables[i] == 0) {
-			for(size_t j = 0; j < i; j++) {
-				free(tables[j]);
-			}
-			free(tables);
+		table->tables[i] = calloc(LOOKUP_TABLE_SIZE, sizeof(bit_array**));
+		if (table->tables[i] == NULL) {
+			bit_array_interleave_free_lookup_tables(table);
 			return NULL;
 		}
-	}
 
-	for(size_t i = 0; i < dim; i++) {
-		int res = bit_array_interleave_new_lookup_table(dim, tables[i], i);
-		if (res < 0) {
-			for(size_t j = 0; j < i; j++) {
-				bit_array_interleave_free_lookup_table(tables[j]);
+		for (size_t j = 0; j < LOOKUP_TABLE_SIZE; j++) {
+			table->tables[i][j] = bit_array_create(dim);
+			if (table->tables[i] == NULL) {
+				bit_array_interleave_free_lookup_tables(table);
+				return NULL;
 			}
-			free(tables);
-			return NULL;
 		}
+
+		fill_table(table->tables[i], dim, i);
 	}
 
-	return tables;
+	return table;
 }
 
 void
-bit_array_interleave_free_lookup_tables(bit_array ***tables, size_t dim)
+bit_array_interleave_free_lookup_tables(
+		struct bit_array_interleave_lookup_table *table)
 {
-	for (size_t i = 0; i < dim; i++) {
-		bit_array_interleave_free_lookup_table(tables[i]);
+
+	if (table->tables != NULL) {
+		for (size_t i = 0; i < table->dim; i++) {
+			bit_array_interleave_free_dim_lookup_table(table->tables[i]);
+			table->tables[i] = NULL;
+		}
+
+		free(table->tables);
+		table->tables = NULL;
 	}
-	free(tables);
+
+	if (table->buffer != NULL) {
+		free(table->buffer);
+		table->buffer = NULL;
+	}
+
+	table->dim = 0;
+	free(table);
 }
 
 int
-bit_array_interleave(bit_array ***tables, size_t dim,
+bit_array_interleave(struct bit_array_interleave_lookup_table *table,
 					 const uint64_t *in, bit_array *out)
 {
 	const size_t octets_count = 8;
 	const size_t octet_size = 8;
 
-	bit_array *tmp = bit_array_create(dim);
-	if (tmp == NULL)
-		return -1;
-
+	bit_array_clear_all(table->buffer);
 	for (size_t i = 0; i < octets_count; i++) {
 		size_t shift = octet_size * i;
-		for (size_t j = 0; j < dim; j++) {
+		for (size_t j = 0; j < table->dim; j++) {
 			uint8_t octet = (in[j] >> shift);
-			const bit_array *value = tables[j][octet];
-			bit_array_or(tmp, value);
+			const bit_array *value = table->tables[j][octet];
+			bit_array_or(table->buffer, value);
 		}
-		bit_array_shift_left(tmp, dim * shift);
-		bit_array_or(out, tmp);
-		bit_array_clear_all(tmp);
+		bit_array_shift_left(table->buffer, table->dim * shift);
+		bit_array_or(out, table->buffer);
+		bit_array_clear_all(table->buffer);
 	}
-	bit_array_free(tmp);
+
 	return 0;
 }
