@@ -12,4 +12,4 @@ else()
 endif()
 
 add_executable(main.bench main.c)
-target_link_libraries(main.bench bit_array)
+target_link_libraries(main.bench bit_array small)

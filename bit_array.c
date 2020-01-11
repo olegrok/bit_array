@@ -15,24 +15,23 @@ bit_array_bsize(word_addr_t num_of_words)
 }
 
 bit_array *
-bit_array_create(word_addr_t num_of_words)
+bit_array_create(struct mempool *pool, word_addr_t num_of_words)
 {
-	size_t size = bit_array_bsize(num_of_words);
-
-	bit_array *bitarr = (bit_array *)calloc(1, size);
+	bit_array *bitarr = (bit_array *)mempool_alloc(pool);
 	if (bitarr == NULL) {
 		return NULL;
 	}
 
 	bitarr->words = (void*)(bitarr + 1);
 	bitarr->num_of_words = num_of_words;
+	bit_array_clear_all(bitarr);
 	return bitarr;
 }
 
 inline void
-bit_array_free(bit_array *array)
+bit_array_free(struct mempool *pool, bit_array *array)
 {
-	free(array);
+	mempool_free(pool, array);
 }
 
 void
@@ -107,7 +106,6 @@ bit_array_clear_all(bit_array *bitarr)
 	memset(bitarr->words, 0, bitarr->num_of_words * sizeof(word_t));
 }
 
-
 bit_index_t
 bit_array_length(const bit_array *bit_arr)
 {
@@ -124,9 +122,9 @@ bit_array_copy(bit_array *restrict dst, const bit_array *restrict src)
 }
 
 bit_array *
-bit_array_clone(const bit_array *src)
+bit_array_clone(struct mempool *pool, const bit_array *src)
 {
-	bit_array *dst = bit_array_create(src->num_of_words);
+	bit_array *dst = bit_array_create(pool, src->num_of_words);
 
 	if (dst == NULL) {
 		return NULL;

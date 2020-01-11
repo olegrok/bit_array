@@ -12,16 +12,16 @@ else()
 endif()
 
 add_executable(main.test main.c)
-target_link_libraries(main.test bit_array)
+target_link_libraries(main.test bit_array small)
 
 add_executable(arithmetic.test arithmetic.c)
-target_link_libraries(arithmetic.test bit_array)
+target_link_libraries(arithmetic.test bit_array small)
 
 add_executable(comparison.test comparison.c)
-target_link_libraries(comparison.test bit_array)
+target_link_libraries(comparison.test bit_array small)
 
 add_executable(interleave.test interleave.c)
-target_link_libraries(interleave.test bit_array)
+target_link_libraries(interleave.test bit_array small)
 
 add_test(main ${CMAKE_CURRENT_BUILD_DIR}/main.test)
 add_test(arithmetic ${CMAKE_CURRENT_BUILD_DIR}/arithmetic.test)

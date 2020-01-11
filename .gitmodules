@@ -1,0 +1,3 @@
+[submodule "third_party/small"]
+	path = third_party/small
+	url = https://github.com/tarantool/small

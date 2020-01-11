@@ -22,7 +22,8 @@ fill_table(bit_array **table, size_t dim, uint8_t shift)
 }
 
 static void
-bit_array_interleave_free_dim_lookup_table(bit_array **table)
+bit_array_interleave_free_dim_lookup_table(struct mempool *pool,
+		bit_array **table)
 {
 	if (table == NULL) {
 		return;
@@ -30,7 +31,7 @@ bit_array_interleave_free_dim_lookup_table(bit_array **table)
 
 	for (size_t i = 0; i < LOOKUP_TABLE_SIZE; i++) {
 		if (table[i] != NULL) {
-			bit_array_free(table[i]);
+			bit_array_free(pool, table[i]);
 			table[i] = NULL;
 		}
 	}
@@ -38,7 +39,7 @@ bit_array_interleave_free_dim_lookup_table(bit_array **table)
 }
 
 struct bit_array_interleave_lookup_table *
-bit_array_interleave_new_lookup_tables(size_t dim)
+bit_array_interleave_new_lookup_tables(struct mempool *pool, size_t dim)
 {
 	assert(dim > 0);
 	/* Allocate memory for structure */
@@ -49,9 +50,10 @@ bit_array_interleave_new_lookup_tables(size_t dim)
 		return NULL;
 	}
 	table->dim = dim;
+	table->pool = pool;
 
 	/* Allocate memory for buffer */
-	table->buffer = bit_array_create(dim);
+	table->buffer = bit_array_create(pool, dim);
 	if (table->buffer == NULL) {
 		free(table);
 		return NULL;
@@ -73,7 +75,7 @@ bit_array_interleave_new_lookup_tables(size_t dim)
 		}
 
 		for (size_t j = 0; j < LOOKUP_TABLE_SIZE; j++) {
-			table->tables[i][j] = bit_array_create(dim);
+			table->tables[i][j] = bit_array_create(pool, dim);
 			if (table->tables[i] == NULL) {
 				bit_array_interleave_free_lookup_tables(table);
 				return NULL;
@@ -93,7 +95,8 @@ bit_array_interleave_free_lookup_tables(
 
 	if (table->tables != NULL) {
 		for (size_t i = 0; i < table->dim; i++) {
-			bit_array_interleave_free_dim_lookup_table(table->tables[i]);
+			bit_array_interleave_free_dim_lookup_table(table->pool,
+					table->tables[i]);
 			table->tables[i] = NULL;
 		}
 
@@ -102,7 +105,7 @@ bit_array_interleave_free_lookup_tables(
 	}
 
 	if (table->buffer != NULL) {
-		free(table->buffer);
+		mempool_free(table->pool, table->buffer);
 		table->buffer = NULL;
 	}
 

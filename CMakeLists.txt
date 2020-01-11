@@ -16,6 +16,12 @@ set(lib_sources
     bit_array_interleave.c
     bit_array.c)
 
+set(SMALL_EMBEDDED ON)
+add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/small)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/small)
+include_directories(${PROJECT_SOURCE_DIR}/third_party/small/third_party)
+target_link_libraries(small)
+
 add_library(${PROJECT_NAME} STATIC ${lib_sources})
 
 add_compile_flags("C"

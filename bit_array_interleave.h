@@ -1,6 +1,7 @@
 #ifndef BIT_ARRAY_INTERLEAVE_H
 #define BIT_ARRAY_INTERLEAVE_H
 
+#include <small/mempool.h>
 #include "bit_array.h"
 
 struct bit_array_interleave_lookup_table {
@@ -17,10 +18,14 @@ struct bit_array_interleave_lookup_table {
 	 * Amount of dimensions
 	 */
 	size_t dim;
+	/**
+	 * Mempool ptr
+	 */
+	 struct mempool *pool;
 };
 
 struct bit_array_interleave_lookup_table *
-bit_array_interleave_new_lookup_tables(size_t dim);
+bit_array_interleave_new_lookup_tables(struct mempool *pool, size_t dim);
 
 void
 bit_array_interleave_free_lookup_tables(
