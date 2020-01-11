@@ -145,9 +145,9 @@ bit_array_shift_left(bit_array *bitarr, bit_index_t shift_dist)
 		return;
 	}
 
-	size_t limit = bitarr->num_of_words;
-	size_t offset = shift_dist / WORD_SIZE;
-	size_t remainder = shift_dist % WORD_SIZE;
+	const size_t limit = bitarr->num_of_words;
+	const size_t offset = shift_dist / WORD_SIZE;
+	const size_t remainder = shift_dist % WORD_SIZE;
 
 	word_t upper = 0, lower = 0;
 	for (size_t i = limit - offset - 1;; --i) {
