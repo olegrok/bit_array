@@ -5,7 +5,9 @@
 #include <stdlib.h>
 
 typedef struct bit_array bit_array;
-typedef uint64_t word_t, word_addr_t, bit_index_t;
+typedef uint64_t word_t, bit_index_t;
+typedef uint8_t word_size_t;
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,15 +17,15 @@ extern "C" {
 
 struct bit_array
 {
-	word_addr_t num_of_words;
+	word_size_t num_of_words;
 	word_t *words;
 };
 
 size_t
-bit_array_bsize(word_addr_t num_of_words);
+bit_array_bsize(word_size_t num_of_words);
 
 bit_array *
-bit_array_create(word_addr_t num_of_words);
+bit_array_create(word_size_t num_of_words);
 
 bit_array *
 bit_array_copy(bit_array *restrict dst, const bit_array *restrict src);
@@ -35,7 +37,7 @@ void
 bit_array_add(bit_array *src, const bit_array *add);
 
 void
-bit_array_add_uint64(bit_array *bitarr, uint64_t value);
+bit_array_add_word(bit_array *bitarr, word_t value);
 
 int
 bit_array_cmp(const bit_array *left, const bit_array *right);
