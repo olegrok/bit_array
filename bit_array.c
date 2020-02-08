@@ -8,14 +8,14 @@
 #define WORD_SIZE 64ULL
 
 inline size_t
-bit_array_bsize(word_addr_t num_of_words)
+bit_array_bsize(word_size_t num_of_words)
 {
 	assert(num_of_words > 0);
 	return sizeof(bit_array) + num_of_words * sizeof(word_t);
 }
 
 bit_array *
-bit_array_create(struct mempool *pool, word_addr_t num_of_words)
+bit_array_create(struct mempool *pool, word_size_t num_of_words)
 {
 	bit_array *bitarr = (bit_array *)mempool_alloc(pool);
 	if (bitarr == NULL) {
@@ -38,7 +38,7 @@ void
 bit_array_add(bit_array *src, const bit_array *add)
 {
 	assert(src->num_of_words == add->num_of_words);
-	word_addr_t num_of_words = src->num_of_words;
+	word_size_t num_of_words = src->num_of_words;
 
 	char carry = 0;
 	word_t word1, word2;
@@ -53,13 +53,13 @@ bit_array_add(bit_array *src, const bit_array *add)
 }
 
 void
-bit_array_add_uint64(bit_array *bitarr, uint64_t value)
+bit_array_add_word(bit_array *bitarr, word_t value)
 {
 	if(value == 0) {
 		return;
 	}
 
-	for(word_addr_t i = 0; i < bitarr->num_of_words; i++) {
+	for(word_size_t i = 0; i < bitarr->num_of_words; i++) {
 		if(WORD_MAX - bitarr->words[i] < value) {
 			bitarr->words[i] += value;
 			value = 1;
@@ -73,9 +73,9 @@ bit_array_add_uint64(bit_array *bitarr, uint64_t value)
 
 static inline int
 bit_array_cmp_internal(const word_t *restrict left, const word_t *restrict right,
-		size_t num)
+					   word_size_t num)
 {
-	for(word_addr_t i = num - 1;; i--)
+	for(word_size_t i = num - 1;; i--)
 	{
 		if (left[i] != right[i])
 			return (left[i] > right[i] ? 1 : -1);
@@ -90,7 +90,7 @@ bit_array_cmp(const bit_array *left, const bit_array *right)
 {
 	assert(left->num_of_words == right->num_of_words);
 
-	word_addr_t num_of_words = left->num_of_words;
+	word_size_t num_of_words = left->num_of_words;
 	return bit_array_cmp_internal(left->words, right->words, num_of_words);
 }
 
@@ -161,7 +161,7 @@ bit_array_shift_left(bit_array *bitarr, bit_index_t shift_dist)
 	}
 
 	if (offset)
-		memset(bitarr->words, 0, offset * sizeof(uint64_t));
+		memset(bitarr->words, 0, offset * sizeof(word_t));
 }
 
 static inline void
@@ -194,7 +194,7 @@ bit_array_and(bit_array *restrict dst, const bit_array *restrict src)
 	bit_array_and_internal(dst->words, src->words, num_of_words);
 }
 
-uint64_t
+word_t
 bit_array_get_word(const bit_array *bitarr, bit_index_t num)
 {
 	assert(num < bitarr->num_of_words);
