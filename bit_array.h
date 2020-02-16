@@ -5,13 +5,9 @@
 #include <stdlib.h>
 
 typedef struct bit_array bit_array;
-typedef uint64_t word_t, bit_index_t;
+typedef uint64_t word_t;
+typedef uint8_t bit_index_t;
 typedef uint8_t word_size_t;
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "bit_array_macros.h"
 
@@ -72,9 +68,5 @@ bit_array_get_word(const bit_array *bitarr, bit_index_t num);
 #define bit_array_toggle(arr,i)   bitset_tgl((arr)->words, i)
 // c must be 0 or 1
 #define bit_array_assign(arr,i,c) bitset_cpy((arr)->words,i,c)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //BIT_ARRAY_H
