@@ -19,17 +19,17 @@ test_one()
 	bit_array *src = bit_array_create(&pool, dim);
 	bit_array *add = bit_array_create(&pool, dim);
 
-	assert(bit_array_cmp(src, add) == 0);
-	assert(bit_array_cmp(add, src) == 0);
+	assert(bit_array_cmp(src, add, dim) == 0);
+	assert(bit_array_cmp(add, src, dim) == 0);
 
 	bit_array_set(src, 0);
 	bit_array_set(add, 0);
-	assert(bit_array_cmp(src, add) == 0);
-	assert(bit_array_cmp(add, src) == 0);
+	assert(bit_array_cmp(src, add, dim) == 0);
+	assert(bit_array_cmp(add, src, dim) == 0);
 
-	bit_array_add(src, add);
-	assert(bit_array_cmp(src, add) > 0);
-	assert(bit_array_cmp(add, src) < 0);
+	bit_array_add(src, add, dim);
+	assert(bit_array_cmp(src, add, dim) > 0);
+	assert(bit_array_cmp(add, src, dim) < 0);
 
 	bit_array_free(&pool, src);
 	bit_array_free(&pool, add);
@@ -44,18 +44,18 @@ test_two()
 
 	bit_array *src = bit_array_create(&pool, dim);
 	bit_array *add = bit_array_create(&pool, dim);
-	assert(bit_array_cmp(src, add) == 0);
+	assert(bit_array_cmp(src, add, dim) == 0);
 
 	const size_t WORD_SIZE = 64;
 
 	bit_array_set(src, WORD_SIZE);
 	bit_array_set(add, 0);
-	assert(bit_array_cmp(src, add) > 0);
-	assert(bit_array_cmp(add, src) < 0);
+	assert(bit_array_cmp(src, add, dim) > 0);
+	assert(bit_array_cmp(add, src, dim) < 0);
 
-	bit_array_add(add, src);
-	assert(bit_array_cmp(src, add) < 0);
-	assert(bit_array_cmp(add, src) > 0);
+	bit_array_add(add, src, dim);
+	assert(bit_array_cmp(src, add, dim) < 0);
+	assert(bit_array_cmp(add, src, dim) > 0);
 
 	bit_array_free(&pool, src);
 	bit_array_free(&pool, add);

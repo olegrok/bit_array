@@ -24,13 +24,13 @@ test_simple()
 	bit_array_set(src, 0);
 	bit_array_set(add, 0);
 
-	bit_array_add(src, add);
+	bit_array_add(src, add, dim);
 	assert(bit_array_get(src, 0) == 0);
 	assert(bit_array_get(src, 1) == 1);
 
 	bit_array_clear(src, 1);
 	bit_array_set(src, 1);
-	bit_array_add(src, add);
+	bit_array_add(src, add, dim);
 
 	assert(bit_array_get(src, 0) == 1);
 	assert(bit_array_get(src, 1) == 1);
@@ -51,7 +51,7 @@ test_carry()
 		bit_array_set(src, i);
 	}
 
-	bit_array_add(src, add);
+	bit_array_add(src, add, dim);
 
 	for (size_t i = 0; i < WORD_SIZE; ++i) {
 		assert(bit_array_get(src, i) == 0);
@@ -73,9 +73,9 @@ test_carry2()
 		bit_array_set(src, i);
 	}
 
-	bit_array_add(src, add);
+	bit_array_add(src, add, dim);
 
-	for (size_t i = 0; i < 2 * WORD_SIZE; ++i) {
+	for (size_t i = 0; i < dim * WORD_SIZE; ++i) {
 		assert(bit_array_get(src, i) == (i == WORD_SIZE));
 	}
 
@@ -88,14 +88,14 @@ test_add_word()
 {
 	const size_t dim = 1;
 	bit_array *array = bit_array_create(&pool_1, dim);
-	bit_array_add_word(array, 5);
+	bit_array_add_word(array, 5, dim);
 	assert(bit_array_get(array, 0) == 1);
 	assert(bit_array_get(array, 1) == 0);
 	assert(bit_array_get(array, 2) == 1);
 	assert(bit_array_get(array, 3) == 0);
 
-	bit_array_set_all(array);
-	bit_array_add_word(array, 1);
+	bit_array_set_all(array, dim);
+	bit_array_add_word(array, 1, dim);
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		assert(bit_array_get(array, 0) == 0);
 	}
@@ -110,7 +110,7 @@ test_add_word_carry()
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		bit_array_set(array, i);
 	}
-	bit_array_add_word(array, 1);
+	bit_array_add_word(array, 1, dim);
 	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == (i == WORD_SIZE));
 	}
@@ -122,10 +122,10 @@ test_add_word_carry2()
 {
 	const size_t dim = 2;
 	bit_array *array = bit_array_create(&pool_2, dim);
-	bit_array_set_all(array);
+	bit_array_set_all(array, dim);
 	bit_array_clear(array, 0);
 	bit_array_clear(array, WORD_SIZE);
-	bit_array_add_word(array, 2);
+	bit_array_add_word(array, 2, dim);
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == 0);
 		assert(bit_array_get(array, i + WORD_SIZE) == 1);
@@ -139,15 +139,15 @@ test_or()
 	const size_t dim = 2;
 	bit_array *first = bit_array_create(&pool_2, dim);
 	bit_array *second = bit_array_create(&pool_2, dim);
-	bit_array_set_all(first);
+	bit_array_set_all(first, dim);
 
-	bit_array_or(first, second);
+	bit_array_or(first, second, dim);
 	assert(bit_array_get_word(first, 0) == -1ULL);
 	assert(bit_array_get_word(first, 1) == -1ULL);
 
 
-	bit_array_clear_all(first);
-	bit_array_clear_all(second);
+	bit_array_clear_all(first, dim);
+	bit_array_clear_all(second, dim);
 
 	bit_array_set(first, 90);
 	bit_array_set(first, 80);
@@ -157,7 +157,7 @@ test_or()
 	bit_array_set(second, 80);
 	bit_array_set(second, 30);
 	bit_array_set(second, 10);
-	bit_array_or(first, second);
+	bit_array_or(first, second, dim);
 
 	assert(bit_array_get(first, 100) == 1);
 	assert(bit_array_get(first, 90) == 1);
@@ -176,14 +176,14 @@ test_and()
 	const size_t dim = 2;
 	bit_array *first = bit_array_create(&pool_2, dim);
 	bit_array *second = bit_array_create(&pool_2, dim);
-	bit_array_set_all(first);
+	bit_array_set_all(first, dim);
 
-	bit_array_and(first, second);
+	bit_array_and(first, second, dim);
 	assert(bit_array_get_word(first, 0) == 0);
 	assert(bit_array_get_word(first, 1) == 0);
 
-	bit_array_clear_all(first);
-	bit_array_clear_all(second);
+	bit_array_clear_all(first, dim);
+	bit_array_clear_all(second, dim);
 
 	bit_array_set(first, 90);
 	bit_array_set(first, 80);
@@ -193,7 +193,7 @@ test_and()
 	bit_array_set(second, 80);
 	bit_array_set(second, 30);
 	bit_array_set(second, 10);
-	bit_array_and(first, second);
+	bit_array_and(first, second, dim);
 
 	assert(bit_array_get(first, 100) == 0);
 	assert(bit_array_get(first, 90) == 0);

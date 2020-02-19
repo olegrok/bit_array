@@ -29,16 +29,10 @@
 #define bitset_tgl(arr,pos)     bitset_op(bitset2_tgl, arr, pos)
 #define bitset_cpy(arr,pos,bit) bitset_op2(bitset2_cpy, arr, pos, bit)
 
-#define bit_array_get(arr,i)      bitset_get((arr)->words, i)
-#define bit_array_set(arr,i)      bitset_set((arr)->words, i)
-#define bit_array_clear(arr,i)    bitset_del((arr)->words, i)
-#define bit_array_toggle(arr,i)   bitset_tgl((arr)->words, i)
-#define bit_array_assign(arr,i,c) bitset_cpy((arr)->words,i,c)
-
-#define bit_array_num_of_words(arr) ((arr)->num_of_words)
-
-#define bitmask(nbits,type) ((nbits) ? ~(type)0 >> (sizeof(type)*8-(nbits)): (type)0)
-#define bitmask64(nbits) bitmask(nbits,uint64_t)
-#define bitmask_merge(a,b,abits) (b ^ ((a ^ b) & abits))
+#define bit_array_get(arr,i)      bitset_get(arr, i)
+#define bit_array_set(arr,i)      bitset_set(arr, i)
+#define bit_array_clear(arr,i)    bitset_del(arr, i)
+#define bit_array_toggle(arr,i)   bitset_tgl(arr, i)
+#define bit_array_assign(arr,i,c) bitset_cpy(arr,i,c)
 
 #endif //BIT_ARRAY_MACROS_H

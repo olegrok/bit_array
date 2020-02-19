@@ -119,18 +119,19 @@ bit_array_interleave(struct bit_array_interleave_lookup_table *table,
 {
 	const uint8_t octets_count_in_word = 8;
 	const uint8_t octet_size_in_bits = 8;
+	const uint8_t dim = table->dim;
 
-	bit_array_clear_all(table->buffer);
+	bit_array_clear_all(table->buffer, dim);
 	for (uint8_t i = 0; i < octets_count_in_word; i++) {
 		uint16_t shift = octet_size_in_bits * i;
-		for (uint8_t j = 0; j < table->dim; j++) {
+		for (uint8_t j = 0; j < dim; j++) {
 			uint8_t octet = (in[j] >> shift);
 			const bit_array *value = table->tables[j][octet];
-			bit_array_or(table->buffer, value);
+			bit_array_or(table->buffer, value, dim);
 		}
-		bit_array_shift_left(table->buffer, table->dim * shift);
-		bit_array_or(out, table->buffer);
-		bit_array_clear_all(table->buffer);
+		bit_array_shift_left(table->buffer, dim * shift, dim);
+		bit_array_or(out, table->buffer, dim);
+		bit_array_clear_all(table->buffer, dim);
 	}
 
 	return 0;

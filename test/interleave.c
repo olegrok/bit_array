@@ -27,7 +27,7 @@ test_one_dim()
 			bit_array_interleave_new_lookup_tables(&pool, dim);
 
 	for (size_t i = 0; i < size; i++) {
-		bit_array_clear_all(arr);
+		bit_array_clear_all(arr, dim);
 		keys[0] = test_cases[i];
 		bit_array_interleave(tables, keys, arr);
 		assert(bit_array_get_word(arr, 0) == keys[0]);
@@ -56,14 +56,14 @@ test_two_dims()
 	/* 0..01 and 0..01 -> 0..011 */
 	assert(bit_array_get_word(arr, 0) == 3);
 	assert(bit_array_get_word(arr, 1) == 0);
-	bit_array_clear_all(arr);
+	bit_array_clear_all(arr, dim);
 
 	keys[0] = keys[1] = -1ULL;
 	bit_array_interleave(tables, keys, arr);
 	/* 1..11 and 1..11 -> 1..11 */
 	assert(bit_array_get_word(arr, 0) == -1ULL);
 	assert(bit_array_get_word(arr, 1) == -1ULL);
-	bit_array_clear_all(arr);
+	bit_array_clear_all(arr, dim);
 
 	/* 1..11 */
 	keys[0] = -1ULL;
@@ -73,7 +73,7 @@ test_two_dims()
 	/* 010..101 */
 	assert(bit_array_get_word(arr, 0) == 6148914691236517205ULL);
 	assert(bit_array_get_word(arr, 1) == 6148914691236517205ULL);
-	bit_array_clear_all(arr);
+	bit_array_clear_all(arr, dim);
 
 	/* 111 */
 	keys[0] = 7;
@@ -83,7 +83,7 @@ test_two_dims()
 	/* 110101 */
 	assert(bit_array_get_word(arr, 0) == 53);
 	assert(bit_array_get_word(arr, 1) == 0);
-	bit_array_clear_all(arr);
+	bit_array_clear_all(arr, dim);
 
 	bit_array_interleave_free_lookup_tables(tables);
 	bit_array_free(&pool, arr);

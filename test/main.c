@@ -63,7 +63,7 @@ test_clear()
 
 	for (size_t i = 0; i < 5 * WORD_SIZE; i++) {
 		bit_array_clear(array, i);
-		for (size_t j = 0; i < 5 * WORD_SIZE; i++) {
+		for (size_t j = 0; j < 5 * WORD_SIZE; j++) {
 			assert(bit_array_get(array, j) == (j > i));
 		}
 	}
@@ -80,7 +80,7 @@ test_toggle()
 	}
 
 	for (size_t i = 0; i < 5 * WORD_SIZE; i++) {
-		uint8_t bit = bit_array_get(array, i);
+		__attribute__((unused)) uint8_t bit = bit_array_get(array, i);
 		bit_array_toggle(array, i);
 		assert(bit != bit_array_get(array, i));
 	}
@@ -103,15 +103,16 @@ test_assign()
 static void
 test_set_all()
 {
-	bit_array *array = bit_array_create(&pool_2, 2);
+	uint8_t dim = 2;
+	bit_array *array = bit_array_create(&pool_2, dim);
 
-	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
+	for (size_t i = 0; i < dim * WORD_SIZE; i++) {
 		bit_array_clear(array, i);
 		assert(bit_array_get(array, i) == 0);
 	}
 
-	bit_array_set_all(array);
-	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
+	bit_array_set_all(array, dim);
+	for (size_t i = 0; i < dim * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == 1);
 	}
 
@@ -121,14 +122,15 @@ test_set_all()
 static void
 test_clear_all()
 {
-	bit_array *array = bit_array_create(&pool_2, 2);
+	uint8_t dim = 2;
+	bit_array *array = bit_array_create(&pool_2, dim);
 
 	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
 		bit_array_set(array, i);
 		assert(bit_array_get(array, i) == 1);
 	}
 
-	bit_array_clear_all(array);
+	bit_array_clear_all(array, dim);
 	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == 0);
 	}
@@ -139,39 +141,21 @@ test_clear_all()
 static void
 test_length()
 {
-	bit_array *array2 = bit_array_create(&pool_2, 2);
-	bit_array *array5 = bit_array_create(&pool_5, 5);
-
-	assert(bit_array_length(array2) == 128);
-	assert(bit_array_length(array5) == 320);
-
-	bit_array_free(&pool_2, array2);
-	bit_array_free(&pool_5, array5);
-}
-
-static void
-test_num_of_words()
-{
-	bit_array *array2 = bit_array_create(&pool_2, 2);
-	bit_array *array5 = bit_array_create(&pool_5, 5);
-
-	assert(bit_array_num_of_words(array2) == 2);
-	assert(bit_array_num_of_words(array5) == 5);
-
-	bit_array_free(&pool_2, array2);
-	bit_array_free(&pool_5, array5);
+	assert(bit_array_length(2) == 128);
+	assert(bit_array_length(5) == 320);
 }
 
 static void
 test_clone()
 {
-	bit_array *array = bit_array_create(&pool_5, 5);
+	uint8_t dim = 5;
+	bit_array *array = bit_array_create(&pool_5, dim);
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		bit_array_set(array, i);
 		bit_array_set(array, 3 * WORD_SIZE + i);
 	}
 
-	bit_array *clone_array = bit_array_clone(&pool_5, array);
+	bit_array *clone_array = bit_array_clone(&pool_5, array, dim);
 	assert(array != clone_array);
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		assert(bit_array_get(clone_array, i) == 1);
@@ -185,15 +169,16 @@ test_clone()
 static void
 test_copy()
 {
-	bit_array *array = bit_array_create(&pool_5, 5);
-	bit_array *copy_array = bit_array_create(&pool_5, 5);
+	const uint8_t dim = 5;
+	bit_array *array = bit_array_create(&pool_5, dim);
+	bit_array *copy_array = bit_array_create(&pool_5, dim);
 
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		bit_array_set(array, i);
 		bit_array_set(array, 3 * WORD_SIZE + i);
 	}
 
-	bit_array_copy(copy_array, array);
+	bit_array_copy(copy_array, array, dim);
 	for (size_t i = 0; i < WORD_SIZE; i++) {
 		assert(bit_array_get(copy_array, i) == 1);
 		assert(bit_array_get(array, 3 * WORD_SIZE + i) == 1);
@@ -206,48 +191,49 @@ test_copy()
 static void
 test_shift()
 {
-	bit_array *array = bit_array_create(&pool_2, 2);
+	const uint8_t dim = 2;
+	bit_array *array = bit_array_create(&pool_2, dim);
 
 	bit_array_set(array, 0);
-	bit_array_shift_left(array, 0);
+	bit_array_shift_left(array, 0, dim);
 
 	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == (i == 0));
 	}
 
-	bit_array_shift_left(array, 1);
+	bit_array_shift_left(array, 1, dim);
 
 	assert(bit_array_get(array, 0) == 0);
 	assert(bit_array_get(array, 1) == 1);
 
-	bit_array_shift_left(array, WORD_SIZE);
+	bit_array_shift_left(array, WORD_SIZE, dim);
 
-	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
+	for (size_t i = 0; i < dim * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == (i == (WORD_SIZE + 1)));
 	}
 
 	bit_array_set(array, 0);
-	bit_array_shift_left(array, 1);
+	bit_array_shift_left(array, 1, dim);
 
 	assert(bit_array_get(array, 1) == 1);
 	assert(bit_array_get(array, WORD_SIZE + 2) == 1);
 	bit_array_free(&pool_2, array);
 
-	array = bit_array_create(&pool_2, 2);
+	array = bit_array_create(&pool_2, dim);
 	bit_array_set(array, 0);
-	bit_array_shift_left(array, 2 * WORD_SIZE);
+	bit_array_shift_left(array, dim * WORD_SIZE, dim);
 	for (size_t i = 0; i < 2 * WORD_SIZE; i++) {
 		assert(bit_array_get(array, i) == 0);
 	}
 
-	bit_array_clear_all(array);
-	bit_array_add_word(array, -1ULL);
+	bit_array_clear_all(array, dim);
+	bit_array_add_word(array, -1ULL, dim);
 	assert(bit_array_get_word(array, 0) == -1ULL);
 	assert(bit_array_get_word(array, 1) == 0);
-	bit_array_shift_left(array, WORD_SIZE);
+	bit_array_shift_left(array, WORD_SIZE, dim);
 	assert(bit_array_get_word(array, 0) == 0);
 	assert(bit_array_get_word(array, 1) == -1ULL);
-	bit_array_shift_left(array, WORD_SIZE);
+	bit_array_shift_left(array, WORD_SIZE, dim);
 	assert(bit_array_get_word(array, 0) == 0);
 	assert(bit_array_get_word(array, 1) == 0);
 
@@ -293,7 +279,6 @@ main()
 	test_set_all();
 	test_clear_all();
 	test_length();
-	test_num_of_words();
 	test_clone();
 	test_copy();
 	test_shift();
